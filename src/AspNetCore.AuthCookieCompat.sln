@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AspNetCore.LegacyAuthCookieCompat", "AspNetCore.AuthCookieCompat\AspNetCore.LegacyAuthCookieCompat.csproj", "{0AE72F8C-44AC-4171-99B5-1F3658419946}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AspNetCore.LegacyAuthCookieCompat.Tests", "AspNetCore.LegacyAuthCookieCompat.Tests\AspNetCore.LegacyAuthCookieCompat.Tests.csproj", "{B3062006-B90A-4FB3-B328-2830001D0824}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{0AE72F8C-44AC-4171-99B5-1F3658419946}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0AE72F8C-44AC-4171-99B5-1F3658419946}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0AE72F8C-44AC-4171-99B5-1F3658419946}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0AE72F8C-44AC-4171-99B5-1F3658419946}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B3062006-B90A-4FB3-B328-2830001D0824}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B3062006-B90A-4FB3-B328-2830001D0824}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B3062006-B90A-4FB3-B328-2830001D0824}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B3062006-B90A-4FB3-B328-2830001D0824}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
