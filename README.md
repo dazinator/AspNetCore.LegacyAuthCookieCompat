@@ -1,5 +1,6 @@
 # AspNetCore.LegacyAuthCookieCompat
-This library provides the ability to encrypt or decrypt legacy (.Net 2 & 3.5 ) forms authentication cookies.
+This library provides the ability to encrypt or decrypt legacy forms authentication cookies compatible with .NET 2 & 3.5 web applications, that use SHA1 validation and AES.
+
 This is useful if you are hoping to, for example, integrate OWIN / AspNet Core cookies middleware, with the legacy cookie format.
 
 # Usage
