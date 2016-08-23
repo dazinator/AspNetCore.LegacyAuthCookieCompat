@@ -12,6 +12,10 @@ In order to encrypt / decrypt the auth cookie data, you need to provide the SHA1
 
 ```
 
+Then, within your application that wishes to read the cookie (or produce one) - add the following NuGet package:
+
+https://www.nuget.org/packages/AspNetCore.LegacyAuthCookieCompat/
+
 To encrypt a FormsAuthenticationTicket do the following: (We'd usually then write the ecrypted data as an auth cookie)
 
 ```csharp
