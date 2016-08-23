@@ -192,7 +192,7 @@ namespace AspNetCore.LegacyAuthCookieCompat
         /// </summary>
         /// <param name="ticket"></param>
         /// <param name="hasher">If hasher it not null, it will be used to generate hash which is used to sign the encrypted data by adding it to the end. If it is null, no signature will be added.</param>
-        /// <param name="randomiseUsingHash">If true, the hash of the encrypted data will be prepended to the beginning, otherwise random bytes will be generated and prepended.</param>
+        /// <param name="randomiseUsingHash">If true, the hash of the encrypted data will be prepended to the beginning, otherwise random bytes will be generated and prepended to the beggining.</param>
         /// <returns></returns>
         public string Encrypt(FormsAuthenticationTicket ticket, Sha1HashProvider hasher, bool randomiseUsingHash = false)
         {
