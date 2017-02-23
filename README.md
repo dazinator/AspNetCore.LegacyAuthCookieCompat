@@ -1,7 +1,10 @@
 # AspNetCore.LegacyAuthCookieCompat
-This library provides the ability to encrypt or decrypt authentication cookies, that are compatible with .NET 2 & 3.5 web applications, using SHA1 validation and AES.
+This library provides the ability to encrypt or decrypt a `FormsAuthenticationTicket` which are used for Forms Authentication cookies.
+The cookie will be compatible with .NET 2 / 3.5 & .NET 4 asp.net web applications, that use FormsAuthentication, with SHA1 validation and AES.
 
 This is useful if you are hoping to, for example, integrate OWIN / AspNet Core cookies middleware, with a legacy .NET 3.5 web application, and want single sign on / off.
+
+IMPORTANT: This library is not cross platform, and requires your asp.net core application to target .NET45. This is because in order to encrypt or decrypt a FormsAuthenticationTicket - it requires a native windows library called webengine4.dll - as [explained here](Not compatible with netcoreapp1.0) - so this cannot be done on Linux / IOS or any other platforms: 
 
 # Usage
 
