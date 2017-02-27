@@ -11,7 +11,7 @@ IMPORTANT: This library is not cross platform, and requires your asp.net core ap
 In order to encrypt / decrypt the auth cookie data, you need to provide the SHA1 `ValidationKey` and the AES `DecryptionKey`. These can usually be found in your existing asp.net 3.5 websites web.config:
 
 ```
-    <machineKey validation="SHA1" decryption="AES" validationKey="XXXXX" decryptionKey="XXXXX" />
+    <machineKey validation="SHA1" validationKey="XXXXX" decryption="AES" decryptionKey="XXXXX" />
 
 ```
 
@@ -19,30 +19,28 @@ Then, within your application that wishes to read the cookie (or produce one) - 
 
 https://www.nuget.org/packages/AspNetCore.LegacyAuthCookieCompat/
 
-To encrypt a FormsAuthenticationTicket do the following: (We'd usually then write the ecrypted data as an auth cookie)
+To encrypt a FormsAuthenticationTicket do the following: (We'd usually then write the encrypted data as an auth cookie)
 
-```csharp
- 
-          var issueDate = new DateTime(2015, 12, 22, 15, 09, 25);
-          var expiryDate = new DateTime(0001, 01, 01, 00, 00, 00);
-          var authTicket = new FormsAuthenticationTicket(2, "someuser@some-email.com", issueDate, expiryDate, false, "custom data", "/");
+```csharp	
+var issueDate = DateTime.Now;
+var expiryDate = issueDate.AddHours(1);
+var formsAuthenticationTicket = new FormsAuthenticationTicket(2, "someuser@some-email.com", issueDate, expiryDate, false, "custom data", "/");
 
-          var sha1Hasher = new Sha1HashProvider(_ValidationKeyText);
-          var sut = new LegacyFormsAuthenticationTicketEncryptor(_DecryptionKeyText);
+byte[] decryptionKeyBytes = HexUtils.HexToBinary(_DecryptionKeyText);
+byte[] validationKeyBytes = HexUtils.HexToBinary(_ValidationKeyText);
 
-          // Act
-          // We encrypt the forms auth cookie.
-          var encryptedText = sut.Encrypt(authTicket, sha1Hasher);
-          
-          // We'd now usually write this as an authentication cookie..
+var legacyFormsAuthenticationTicketEncryptor = new LegacyFormsAuthenticationTicketEncryptor(decryptionKeyBytes, validationKeyBytes);
 
+// Act
+// We encrypt the forms auth cookie.
+var encryptedText = legacyFormsAuthenticationTicketEncryptor.Encrypt(authTicket, sha1Hasher);
+
+// We'd now usually write this as an authentication cookie..
 ```
 
 To Decrypt: (We'd usually read the encrypted text from the auth cookie)
 
 ```csharp
-           
-            FormsAuthenticationTicket decryptedTicket = sut.DecryptCookie(encryptedText, new Sha1HashProvider(_ValidationKeyText));
-
+FormsAuthenticationTicket decryptedTicket = sut.DecryptCookie(encryptedText, new Sha1HashProvider(_ValidationKeyText));
 ```
 
