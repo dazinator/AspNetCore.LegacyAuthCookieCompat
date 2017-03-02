@@ -1,11 +1,10 @@
 ﻿using System;
-using System.Runtime.InteropServices;
+using System.Security.Cryptography;
 
 namespace AspNetCore.LegacyAuthCookieCompat
 {
-    public class Sha1HashProvider
+	public class Sha1HashProvider
     {
-
         public const int SHA1_HASH_SIZE = 20;
         public const int SHA1_KEY_SIZE = 64;
 
@@ -17,11 +16,11 @@ namespace AspNetCore.LegacyAuthCookieCompat
         private byte[] _inner = null;
         private byte[] _outer = null;
 
-        public Sha1HashProvider(string validationKey, int hashSize = SHA1_HASH_SIZE, int keySize = SHA1_KEY_SIZE)
+        public Sha1HashProvider(byte[] validationKey, int hashSize = SHA1_HASH_SIZE, int keySize = SHA1_KEY_SIZE)
         {
             _HashSize = hashSize;
             _KeySize = keySize;
-            _validationKeyBlob = HexUtils.HexStringToByteArray(validationKey);
+            _validationKeyBlob = validationKey;
             SetInnerOuterKeys(_validationKeyBlob, ref _inner, ref _outer);
         }
 
@@ -32,17 +31,13 @@ namespace AspNetCore.LegacyAuthCookieCompat
                 throw new ArgumentException("start");
             if (length < 0 || buf == null || (start + length) > buf.Length)
                 throw new ArgumentException("length");
-            byte[] hash = new byte[_HashSize];
 
-            int hr = UnsafeNativeMethods.GetHMACSHA1Hash(buf, start, length,
-                                                         modifier, (modifier == null) ? 0 : modifier.Length,
-                                                         _inner, _inner.Length, _outer, _outer.Length,
-                                                         hash, hash.Length);
-            if (hr == 0)
-                return hash;
-            //_UseHMACSHA = false;
-            return null;
-        }
+			var hmacsha1Hasher = new HMACSHA1(_validationKeyBlob);
+
+			byte[] hash = hmacsha1Hasher.ComputeHash(buf, start, length);
+
+			return hash;
+		}
 
         public byte[] CheckHashAndRemove(byte[] bufHashed)
         {
@@ -90,9 +85,10 @@ namespace AspNetCore.LegacyAuthCookieCompat
             if (validationKey.Length > _KeySize)
             {
                 key = new byte[_HashSize];
-                int hr = UnsafeNativeMethods.GetSHA1Hash(validationKey, validationKey.Length, key, key.Length);
-                Marshal.ThrowExceptionForHR(hr);
-            }
+
+				var hmacsha1Hasher = new HMACSHA1(validationKey);
+				hmacsha1Hasher.ComputeHash(key);
+			}
 
             if (inner == null)
                 inner = new byte[_KeySize];
@@ -128,11 +124,11 @@ namespace AspNetCore.LegacyAuthCookieCompat
             while (bytesWritten < ivLength)
             {
                 byte[] newHash = new byte[_HashSize];
-                int hr = UnsafeNativeMethods.GetSHA1Hash(hash, hash.Length, newHash, newHash.Length);
-                Marshal.ThrowExceptionForHR(hr);
-                hash = newHash;
 
-                int bytesToCopy = Math.Min(_HashSize, bytesToWrite);
+				var hmacsha1Hasher = new HMACSHA1(_validationKeyBlob);
+				newHash = hmacsha1Hasher.ComputeHash(hash);
+
+				int bytesToCopy = Math.Min(_HashSize, bytesToWrite);
                 Buffer.BlockCopy(hash, 0, iv, bytesWritten, bytesToCopy);
 
                 bytesWritten += bytesToCopy;

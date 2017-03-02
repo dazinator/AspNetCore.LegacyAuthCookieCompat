@@ -1,26 +1,46 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.26206.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AspNetCore.LegacyAuthCookieCompat", "AspNetCore.AuthCookieCompat\AspNetCore.LegacyAuthCookieCompat.csproj", "{0AE72F8C-44AC-4171-99B5-1F3658419946}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspNetCore.LegacyAuthCookieCompat", "AspNetCore.AuthCookieCompat\AspNetCore.LegacyAuthCookieCompat.csproj", "{15CF0DA6-EC7B-40B5-9091-AA07971F36FB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AspNetCore.LegacyAuthCookieCompat.Tests", "AspNetCore.LegacyAuthCookieCompat.Tests\AspNetCore.LegacyAuthCookieCompat.Tests.csproj", "{B3062006-B90A-4FB3-B328-2830001D0824}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AspNetCore.LegacyAuthCookieCompat.Tests", "AspNetCore.LegacyAuthCookieCompat.Tests\AspNetCore.LegacyAuthCookieCompat.Tests.csproj", "{B7C14A90-3BE8-4D09-8FC8-CC4AF0BF15AE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
 		Release|Any CPU = Release|Any CPU
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{0AE72F8C-44AC-4171-99B5-1F3658419946}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{0AE72F8C-44AC-4171-99B5-1F3658419946}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{0AE72F8C-44AC-4171-99B5-1F3658419946}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{0AE72F8C-44AC-4171-99B5-1F3658419946}.Release|Any CPU.Build.0 = Release|Any CPU
-		{B3062006-B90A-4FB3-B328-2830001D0824}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B3062006-B90A-4FB3-B328-2830001D0824}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B3062006-B90A-4FB3-B328-2830001D0824}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B3062006-B90A-4FB3-B328-2830001D0824}.Release|Any CPU.Build.0 = Release|Any CPU
+		{15CF0DA6-EC7B-40B5-9091-AA07971F36FB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{15CF0DA6-EC7B-40B5-9091-AA07971F36FB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{15CF0DA6-EC7B-40B5-9091-AA07971F36FB}.Debug|x64.ActiveCfg = Debug|x64
+		{15CF0DA6-EC7B-40B5-9091-AA07971F36FB}.Debug|x64.Build.0 = Debug|x64
+		{15CF0DA6-EC7B-40B5-9091-AA07971F36FB}.Debug|x86.ActiveCfg = Debug|x86
+		{15CF0DA6-EC7B-40B5-9091-AA07971F36FB}.Debug|x86.Build.0 = Debug|x86
+		{15CF0DA6-EC7B-40B5-9091-AA07971F36FB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{15CF0DA6-EC7B-40B5-9091-AA07971F36FB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{15CF0DA6-EC7B-40B5-9091-AA07971F36FB}.Release|x64.ActiveCfg = Release|x64
+		{15CF0DA6-EC7B-40B5-9091-AA07971F36FB}.Release|x64.Build.0 = Release|x64
+		{15CF0DA6-EC7B-40B5-9091-AA07971F36FB}.Release|x86.ActiveCfg = Release|x86
+		{15CF0DA6-EC7B-40B5-9091-AA07971F36FB}.Release|x86.Build.0 = Release|x86
+		{B7C14A90-3BE8-4D09-8FC8-CC4AF0BF15AE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B7C14A90-3BE8-4D09-8FC8-CC4AF0BF15AE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B7C14A90-3BE8-4D09-8FC8-CC4AF0BF15AE}.Debug|x64.ActiveCfg = Debug|x64
+		{B7C14A90-3BE8-4D09-8FC8-CC4AF0BF15AE}.Debug|x64.Build.0 = Debug|x64
+		{B7C14A90-3BE8-4D09-8FC8-CC4AF0BF15AE}.Debug|x86.ActiveCfg = Debug|x86
+		{B7C14A90-3BE8-4D09-8FC8-CC4AF0BF15AE}.Debug|x86.Build.0 = Debug|x86
+		{B7C14A90-3BE8-4D09-8FC8-CC4AF0BF15AE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B7C14A90-3BE8-4D09-8FC8-CC4AF0BF15AE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B7C14A90-3BE8-4D09-8FC8-CC4AF0BF15AE}.Release|x64.ActiveCfg = Release|x64
+		{B7C14A90-3BE8-4D09-8FC8-CC4AF0BF15AE}.Release|x64.Build.0 = Release|x64
+		{B7C14A90-3BE8-4D09-8FC8-CC4AF0BF15AE}.Release|x86.ActiveCfg = Release|x86
+		{B7C14A90-3BE8-4D09-8FC8-CC4AF0BF15AE}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
