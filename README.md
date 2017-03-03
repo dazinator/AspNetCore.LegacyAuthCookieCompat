@@ -1,3 +1,5 @@
+[![Build status](https://ci.appveyor.com/api/projects/status/sbsp39sva2i7d5ks/branch/master?svg=true)](https://ci.appveyor.com/project/dazinator/aspnetcore-legacyauthcookiecompat/branch/master)
+
 # AspNetCore.LegacyAuthCookieCompat
 This library provides the ability to encrypt or decrypt a `FormsAuthenticationTicket` which are used for Forms Authentication cookies.
 The cookie will be compatible with .NET 2 / 3.5 & .NET 4 asp.net web applications, that use FormsAuthentication, with SHA1 validation and AES.
