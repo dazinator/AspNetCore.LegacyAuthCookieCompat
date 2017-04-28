@@ -43,6 +43,6 @@ var encryptedText = legacyFormsAuthenticationTicketEncryptor.Encrypt(formsAuthen
 To Decrypt: (We'd usually read the encrypted text from the auth cookie)
 
 ```csharp
-FormsAuthenticationTicket decryptedTicket = sut.DecryptCookie(encryptedText, new Sha1HashProvider(_ValidationKeyText));
+FormsAuthenticationTicket decryptedTicket = legacyFormsAuthenticationTicketEncryptor.DecryptCookie(encryptedText);
 ```
 
