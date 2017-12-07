@@ -15,7 +15,7 @@ namespace AspNetCore.LegacyAuthCookieCompat.Tests
 			string decryptionKey = "AC7387D7E54B156377D81930CF237888854B5B5B515CF2D6356541255E696144";
 
 			// Arrange
-			var issueDate = DateTime.Now;
+			var issueDate = DateTime.UtcNow;
 			var expiryDate = issueDate.AddHours(1);
 			var formsAuthenticationTicket = new FormsAuthenticationTicket(2, "someuser@some-email.com", issueDate, expiryDate, false, "custom data", "/");
 

@@ -25,7 +25,6 @@ namespace AspNetCore.LegacyAuthCookieCompat.Tests
             FormsAuthenticationTicket result = encryptor.DecryptCookie(encryptedText);
 
             Assert.AreEqual("/", result.CookiePath);
-            Assert.AreEqual(true, result.Expired);
             Assert.AreEqual(false, result.IsPersistent);
             Assert.AreEqual("4@@@@ca@ilevelsolutions.com", result.Name);
             Assert.AreEqual("1a4359f8-9d6f-431b-96bf-e83ce59c06f9", result.UserData);
@@ -36,7 +35,7 @@ namespace AspNetCore.LegacyAuthCookieCompat.Tests
         public void Can_Encrypt_And_Decrypt_Forms_Authentication_Ticket_WithSha512()
         {
             // Arrange
-            var issueDate = DateTime.Now;
+            var issueDate = DateTime.UtcNow;
             var expiryDate = issueDate.AddHours(1);
             var formsAuthenticationTicket = new FormsAuthenticationTicket(2, "someuser@some-email.com", issueDate, expiryDate, false, "custom data", "/");
 
@@ -54,7 +53,6 @@ namespace AspNetCore.LegacyAuthCookieCompat.Tests
 
             Assert.AreEqual(formsAuthenticationTicket.CookiePath, decryptedFormsAuthenticationTicket.CookiePath);
             Assert.AreEqual(formsAuthenticationTicket.Expiration, decryptedFormsAuthenticationTicket.Expiration);
-            Assert.AreEqual(formsAuthenticationTicket.Expired, decryptedFormsAuthenticationTicket.Expired);
             Assert.AreEqual(formsAuthenticationTicket.IsPersistent, decryptedFormsAuthenticationTicket.IsPersistent);
             Assert.AreEqual(formsAuthenticationTicket.IssueDate, decryptedFormsAuthenticationTicket.IssueDate);
             Assert.AreEqual(formsAuthenticationTicket.UserData, decryptedFormsAuthenticationTicket.UserData);

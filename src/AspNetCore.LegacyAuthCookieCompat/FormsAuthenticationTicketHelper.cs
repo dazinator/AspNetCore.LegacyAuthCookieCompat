@@ -128,7 +128,7 @@ namespace AspNetCore.LegacyAuthCookieCompat
 
 		internal static FormsAuthenticationTicket FromUtc(int version, String name, DateTime issueDateUtc, DateTime expirationUtc, bool isPersistent, String userData, String cookiePath)
 		{
-			FormsAuthenticationTicket ticket = new FormsAuthenticationTicket(version, name, issueDateUtc.ToLocalTime(), expirationUtc.ToLocalTime(), isPersistent, userData, cookiePath);
+			FormsAuthenticationTicket ticket = new FormsAuthenticationTicket(version, name, issueDateUtc, expirationUtc, isPersistent, userData, cookiePath);
 
 
 			//ticket._IssueDateUtcHasValue = true;
