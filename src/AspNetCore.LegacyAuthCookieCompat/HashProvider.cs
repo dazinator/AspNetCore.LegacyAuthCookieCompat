@@ -12,13 +12,13 @@ namespace AspNetCore.LegacyAuthCookieCompat
         private byte[] _inner = null;
         private byte[] _outer = null;
 
-        public static HashProvider Create(byte[] validationKey, HashAlgorithm hashAlgorithm)
+        public static HashProvider Create(byte[] validationKey, ShaVersion hashAlgorithm)
         {
             switch (hashAlgorithm)
             {
-                case HashAlgorithm.Sha1:
+                case ShaVersion.Sha1:
                     return new Sha1HashProvider(validationKey);
-                case HashAlgorithm.Sha512:
+                case ShaVersion.Sha512:
                     return new Sha512HashProvider(validationKey);
                 default:
                     throw new ArgumentOutOfRangeException(nameof(hashAlgorithm));

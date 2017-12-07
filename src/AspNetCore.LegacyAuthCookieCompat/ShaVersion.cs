@@ -1,6 +1,6 @@
 ﻿namespace AspNetCore.LegacyAuthCookieCompat
 {
-    public enum HashAlgorithm
+    public enum ShaVersion
     {
         Sha1,
         Sha512
