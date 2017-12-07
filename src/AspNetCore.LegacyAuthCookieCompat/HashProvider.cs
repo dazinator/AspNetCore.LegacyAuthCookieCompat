@@ -35,7 +35,7 @@ namespace AspNetCore.LegacyAuthCookieCompat
 
         protected abstract HMAC CreateHasher(byte[] key);
 
-        public byte[] GetHMACSHA1Hash(byte[] buf, byte[] modifier, int start, int length)
+        public byte[] GetHMACSHAHash(byte[] buf, byte[] modifier, int start, int length)
         {
             if (start < 0 || start > buf.Length)
                 throw new ArgumentException("start");
@@ -63,16 +63,16 @@ namespace AspNetCore.LegacyAuthCookieCompat
         {
             // 2. SHA1 Hash is appended to the end.
             // Verify the hash matches by re-computing the hash for this message, and comparing.
-            byte[] hashCheckBlob = GetHMACSHA1Hash(decryptedCookie, null, 0, hashIndex);
+            byte[] hashCheckBlob = GetHMACSHAHash(decryptedCookie, null, 0, hashIndex);
             if (hashCheckBlob == null)
             {
-                throw new Exception();
+                throw new Exception("Hash is not appended to the end.");
             }
 
             //////////////////////////////////////////////////////////////////////
             // Step 2: Make sure the MAC has expected length
             if (hashCheckBlob == null || hashCheckBlob.Length != _HashSize)
-                throw new Exception();
+                throw new Exception($"Invalid hash length: {hashCheckBlob.Length}, expected {_HashSize}");
 
 
             // To prevent a timing attack, we should verify the entire hash instead of failing

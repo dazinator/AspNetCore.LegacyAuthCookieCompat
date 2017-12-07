@@ -155,7 +155,7 @@ namespace AspNetCore.LegacyAuthCookieCompat
                 if (cookieBlob == null)
                 {
                     // signature verification failed
-                    throw new Exception();
+                    throw new Exception("Signature verification failed");
                 }
             }
 
@@ -183,7 +183,7 @@ namespace AspNetCore.LegacyAuthCookieCompat
                             int dataLength = paddedData.Length - ivLength;
                             if (dataLength < 0)
                             {
-                                throw new Exception();
+                                throw new Exception($"Unexpected salt length: {ivLength}. Total: {paddedData.Length}");
                             }
 
                             byte[] decryptedData = new byte[dataLength];
@@ -215,7 +215,7 @@ namespace AspNetCore.LegacyAuthCookieCompat
             byte[] ticketBlob = FormsAuthenticationTicketHelper.Serialize(ticket);
             if (ticketBlob == null)
             {
-                throw new Exception();
+                throw new Exception("Invalid ticket");
             }
 
             byte[] cookieBlob = ticketBlob;
@@ -223,10 +223,10 @@ namespace AspNetCore.LegacyAuthCookieCompat
             // Compute a hash and add to the blob.
             if (_hasher != null)
             {
-                byte[] hashBlob = _hasher.GetHMACSHA1Hash(ticketBlob, null, 0, ticketBlob.Length);
+                byte[] hashBlob = _hasher.GetHMACSHAHash(ticketBlob, null, 0, ticketBlob.Length);
                 if (hashBlob == null)
                 {
-                    throw new Exception();
+                    throw new Exception("Unable to get HMACSHAHash");
                 }
 
                 // create a new byte array big enough to store the ticket data, and the hash data which is appended to the end.
@@ -240,16 +240,16 @@ namespace AspNetCore.LegacyAuthCookieCompat
 
             if (encryptedCookieBlob == null)
             {
-                throw new Exception();
+                throw new Exception("Unable to encrypt cookie");
             }
 
             // sign the encrypted blob 
             if (_hasher != null)
             {
-                byte[] hashBlob = _hasher.GetHMACSHA1Hash(encryptedCookieBlob, null, 0, encryptedCookieBlob.Length);
+                byte[] hashBlob = _hasher.GetHMACSHAHash(encryptedCookieBlob, null, 0, encryptedCookieBlob.Length);
                 if (hashBlob == null)
                 {
-                    throw new Exception();
+                    throw new Exception("Unable to sign cookie");
                 }
 
                 // create a new byte array big enough to store the cookie data, and the hash which is appended to the end.
