@@ -4,9 +4,10 @@ using System.Security.Cryptography;
 
 namespace AspNetCore.LegacyAuthCookieCompat
 {
-	public class LegacyFormsAuthenticationTicketEncryptor
+    public class LegacyFormsAuthenticationTicketEncryptor
     {
-        
+        private const ShaVersion DefaultHashAlgorithm = ShaVersion.Sha1;
+
         private static RandomNumberGenerator _randomNumberGenerator;
         private static RandomNumberGenerator RandomNumberGenerator
         {
@@ -21,33 +22,33 @@ namespace AspNetCore.LegacyAuthCookieCompat
         }
 
         private byte[] _DecryptionKeyBlob = null;
-		private Sha1HashProvider _hasher;
+        private HashProvider _hasher;
 
-		public LegacyFormsAuthenticationTicketEncryptor(string decryptionKey, string validationKey)
-		{
-			byte[] descriptionKeyBytes = HexUtils.HexToBinary(decryptionKey);
-			byte[] validationKeyBytes = HexUtils.HexToBinary(validationKey);
+        public LegacyFormsAuthenticationTicketEncryptor(string decryptionKey, string validationKey, ShaVersion hashAlgorithm = DefaultHashAlgorithm)
+        {
+            byte[] descriptionKeyBytes = HexUtils.HexToBinary(decryptionKey);
+            byte[] validationKeyBytes = HexUtils.HexToBinary(validationKey);
 
-			Initialize(descriptionKeyBytes, validationKeyBytes);
-		}
+            Initialize(descriptionKeyBytes, validationKeyBytes, hashAlgorithm);
+        }
 
-		public LegacyFormsAuthenticationTicketEncryptor(byte[] decryptionKey, byte[] validationKey)
-		{
-			Initialize(decryptionKey, validationKey);
-		}
+        public LegacyFormsAuthenticationTicketEncryptor(byte[] decryptionKey, byte[] validationKey, ShaVersion hashAlgorithm = DefaultHashAlgorithm)
+        {
+            Initialize(decryptionKey, validationKey, hashAlgorithm);
+        }
 
-		private void Initialize(byte[] decryptionKey, byte[] validationKey)
-		{
-			_DecryptionKeyBlob = decryptionKey;
-			_hasher = new Sha1HashProvider(validationKey);
-		}
+        private void Initialize(byte[] decryptionKey, byte[] validationKey, ShaVersion hashAlgorithm)
+        {
+            _DecryptionKeyBlob = decryptionKey;
+            _hasher = HashProvider.Create(validationKey, hashAlgorithm);            
+        }
 
-		/// <summary>
-		/// Decrypts the ticket
-		/// </summary>
-		/// <param name="cookieString"></param>
-		/// <returns></returns>
-		public FormsAuthenticationTicket DecryptCookie(string cookieString)
+        /// <summary>
+        /// Decrypts the ticket
+        /// </summary>
+        /// <param name="cookieString"></param>
+        /// <returns></returns>
+        public FormsAuthenticationTicket DecryptCookie(string cookieString)
         {
             byte[] cookieBlob = null;
             // 1. Convert from hex to binary.
@@ -71,15 +72,15 @@ namespace AspNetCore.LegacyAuthCookieCompat
 
             bool validHash = _hasher.CheckHash(decryptedCookie, ticketLength);
 
-			if (!validHash)
-			{
-				throw new Exception("Invalid Hash");
-			}
+            if (!validHash)
+            {
+                throw new Exception("Invalid Hash");
+            }
 
             return FormsAuthenticationTicketHelper.Deserialize(decryptedCookie, ticketLength);
         }
 
-        private byte[] EncryptCookieData(byte[] cookieBlob, int length, Sha1HashProvider hasher = null)
+        private byte[] EncryptCookieData(byte[] cookieBlob, int length, HashProvider hasher = null)
         {
 
             using (var aesProvider = Aes.Create())
@@ -140,7 +141,7 @@ namespace AspNetCore.LegacyAuthCookieCompat
             }
         }
 
-        private byte[] Decrypt(byte[] cookieBlob, Sha1HashProvider hasher, bool isHashAppended)
+        private byte[] Decrypt(byte[] cookieBlob, HashProvider hasher, bool isHashAppended)
         {
             if (hasher == null)
             {
@@ -154,7 +155,7 @@ namespace AspNetCore.LegacyAuthCookieCompat
                 if (cookieBlob == null)
                 {
                     // signature verification failed
-                    throw new Exception();
+                    throw new Exception("Signature verification failed");
                 }
             }
 
@@ -182,7 +183,7 @@ namespace AspNetCore.LegacyAuthCookieCompat
                             int dataLength = paddedData.Length - ivLength;
                             if (dataLength < 0)
                             {
-                                throw new Exception();
+                                throw new Exception($"Unexpected salt length: {ivLength}. Total: {paddedData.Length}");
                             }
 
                             byte[] decryptedData = new byte[dataLength];
@@ -214,7 +215,7 @@ namespace AspNetCore.LegacyAuthCookieCompat
             byte[] ticketBlob = FormsAuthenticationTicketHelper.Serialize(ticket);
             if (ticketBlob == null)
             {
-                throw new Exception();
+                throw new Exception("Invalid ticket");
             }
 
             byte[] cookieBlob = ticketBlob;
@@ -222,10 +223,10 @@ namespace AspNetCore.LegacyAuthCookieCompat
             // Compute a hash and add to the blob.
             if (_hasher != null)
             {
-                byte[] hashBlob = _hasher.GetHMACSHA1Hash(ticketBlob, null, 0, ticketBlob.Length);
+                byte[] hashBlob = _hasher.GetHMACSHAHash(ticketBlob, null, 0, ticketBlob.Length);
                 if (hashBlob == null)
                 {
-                    throw new Exception();
+                    throw new Exception("Unable to get HMACSHAHash");
                 }
 
                 // create a new byte array big enough to store the ticket data, and the hash data which is appended to the end.
@@ -239,16 +240,16 @@ namespace AspNetCore.LegacyAuthCookieCompat
 
             if (encryptedCookieBlob == null)
             {
-                throw new Exception();
+                throw new Exception("Unable to encrypt cookie");
             }
 
             // sign the encrypted blob 
             if (_hasher != null)
             {
-                byte[] hashBlob = _hasher.GetHMACSHA1Hash(encryptedCookieBlob, null, 0, encryptedCookieBlob.Length);
+                byte[] hashBlob = _hasher.GetHMACSHAHash(encryptedCookieBlob, null, 0, encryptedCookieBlob.Length);
                 if (hashBlob == null)
                 {
-                    throw new Exception();
+                    throw new Exception("Unable to sign cookie");
                 }
 
                 // create a new byte array big enough to store the cookie data, and the hash which is appended to the end.

@@ -12,7 +12,7 @@ namespace AspNetCore.LegacyAuthCookieCompat
 		public string UserData { get; private set; }
 		public string CookiePath { get; private set; }
 
-		public bool Expired { get { return DateTime.Now >= Expiration; } }
+		public bool Expired { get { return DateTime.UtcNow > Expiration; } }
 
 		public FormsAuthenticationTicket(int version, string name, DateTime issueDate, DateTime expiration, bool isPersistent, string userData, string cookiePath)
 		{
