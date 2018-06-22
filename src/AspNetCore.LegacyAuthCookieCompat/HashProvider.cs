@@ -42,9 +42,9 @@ namespace AspNetCore.LegacyAuthCookieCompat
             if (length < 0 || buf == null || (start + length) > buf.Length)
                 throw new ArgumentException("length");
 
-            var hmacsha1Hasher = CreateHasher(_validationKeyBlob);
+            var hasher = CreateHasher(_validationKeyBlob);
 
-            byte[] hash = hmacsha1Hasher.ComputeHash(buf, start, length);
+            byte[] hash = hasher.ComputeHash(buf, start, length);
 
             return hash;
         }
