@@ -15,9 +15,9 @@ before_build:
 build:
   verbosity: detailed
 build_script:
-- cmd: dotnet restore ./src/AspNetCore.AuthCookieCompat.sln --disable-parallel
-- cmd: dotnet build ./src/AspNetCore.AuthCookieCompat.sln -c Release --disable-parallel
-- cmd: dotnet pack ./src/AspNetCore.AuthCookieCompat.sln -c Release --output ../../artifacts/
+- cmd: dotnet restore ./src/AspNetCore.AuthCookieCompat.sln /p:PackageVersion=%GitVersion_FullSemVer% --disable-parallel
+- cmd: dotnet build ./src/AspNetCore.AuthCookieCompat.sln -c Release /p:PackageVersion=%GitVersion_FullSemVer% --disable-parallel
+- cmd: dotnet pack ./src/AspNetCore.AuthCookieCompat.sln -c Release /p:PackageVersion=%GitVersion_FullSemVer% --output ../../artifacts/
 test_script:
 - cmd: dotnet test src/AspNetCore.LegacyAuthCookieCompat.Tests/AspNetCore.LegacyAuthCookieCompat.Tests.csproj
 artifacts:
