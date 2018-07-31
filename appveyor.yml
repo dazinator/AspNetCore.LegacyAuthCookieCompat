@@ -1,0 +1,30 @@
+skip_tags: true
+image: Visual Studio 2017
+environment:    
+  signingkey:
+    secure: DcEnjxct82WwrppME28Rkw==
+
+install:
+  - cmd: choco install gitversion.portable -pre -y
+  #- ps: iex ((New-Object Net.WebClient).DownloadString('https://raw.githubusercontent.com/appveyor/secure-file/master/install.ps1'))
+  - cmd: appveyor-tools\secure-file -decrypt dazinator.snk.enc -secret %signingkey%
+
+before_build:
+  - ps: gitversion /l console /output buildserver
+
+build:
+  verbosity: detailed
+build_script:
+- cmd: dotnet restore ./src/AspNetCore.AuthCookieCompat.sln --disable-parallel
+- cmd: dotnet build ./src/AspNetCore.AuthCookieCompat.sln -c Release --disable-parallel
+- cmd: dotnet pack ./src/AspNetCore.AuthCookieCompat.sln -c Release --output ../../artifacts/
+test_script:
+- cmd: dotnet test src/AspNetCore.LegacyAuthCookieCompat.Tests/AspNetCore.LegacyAuthCookieCompat.Tests.csproj
+artifacts:
+- path: ./artifacts/*
+deploy:
+  provider: NuGet
+  api_key:
+    secure: u8JpW5kkti8pMi+ra2QcXTJPhkHCA8pkKSiiZOJbcS/vFVHNvF3W8qw1Fy2If6a7
+  skip_symbols: false
+  artifact: /.*\.nupkg/

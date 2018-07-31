@@ -7,6 +7,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspNetCore.LegacyAuthCookie
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspNetCore.LegacyAuthCookieCompat", "AspNetCore.LegacyAuthCookieCompat\AspNetCore.LegacyAuthCookieCompat.csproj", "{03A8DE88-D480-4B4D-93A4-7522E5E13F43}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{1569FE36-A221-4278-9252-874BC48CB101}"
+	ProjectSection(SolutionItems) = preProject
+		..\appveyor.yml = ..\appveyor.yml
+		..\dazinator.snk.enc = ..\dazinator.snk.enc
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
