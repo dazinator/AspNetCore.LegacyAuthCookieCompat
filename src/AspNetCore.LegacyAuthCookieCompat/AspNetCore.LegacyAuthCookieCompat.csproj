@@ -4,4 +4,9 @@
     <TargetFramework>netstandard1.3</TargetFramework>  
   </PropertyGroup>
 
+	<PropertyGroup Condition="  '$(Configuration)' == 'Release' ">
+		<SignAssembly>true</SignAssembly>
+		<AssemblyOriginatorKeyFile>..\..\dazinator.snk</AssemblyOriginatorKeyFile>
+	</PropertyGroup>
+
 </Project>
