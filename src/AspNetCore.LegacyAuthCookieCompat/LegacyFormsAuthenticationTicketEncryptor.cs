@@ -7,6 +7,7 @@ namespace AspNetCore.LegacyAuthCookieCompat
     public class LegacyFormsAuthenticationTicketEncryptor
     {
         private const ShaVersion DefaultHashAlgorithm = ShaVersion.Sha1;
+        private const CompatibilityMode DefaultCompatibilityMode = CompatibilityMode.Framework20SP2;
 
         private static RandomNumberGenerator _randomNumberGenerator;
         private static RandomNumberGenerator RandomNumberGenerator
@@ -22,25 +23,29 @@ namespace AspNetCore.LegacyAuthCookieCompat
         }
 
         private byte[] _DecryptionKeyBlob = null;
+        private CompatibilityMode _CompatibilityMode;
+
         private HashProvider _hasher;
 
-        public LegacyFormsAuthenticationTicketEncryptor(string decryptionKey, string validationKey, ShaVersion hashAlgorithm = DefaultHashAlgorithm)
+        public LegacyFormsAuthenticationTicketEncryptor(string decryptionKey, string validationKey, ShaVersion hashAlgorithm = DefaultHashAlgorithm, CompatibilityMode compatibilityMode = DefaultCompatibilityMode)
         {
             byte[] descriptionKeyBytes = HexUtils.HexToBinary(decryptionKey);
             byte[] validationKeyBytes = HexUtils.HexToBinary(validationKey);
 
-            Initialize(descriptionKeyBytes, validationKeyBytes, hashAlgorithm);
+            Initialize(descriptionKeyBytes, validationKeyBytes, hashAlgorithm, compatibilityMode);
         }
 
-        public LegacyFormsAuthenticationTicketEncryptor(byte[] decryptionKey, byte[] validationKey, ShaVersion hashAlgorithm = DefaultHashAlgorithm)
+        public LegacyFormsAuthenticationTicketEncryptor(byte[] decryptionKey, byte[] validationKey, ShaVersion hashAlgorithm = DefaultHashAlgorithm, CompatibilityMode compatibilityMode = DefaultCompatibilityMode)
         {
-            Initialize(decryptionKey, validationKey, hashAlgorithm);
+            Initialize(decryptionKey, validationKey, hashAlgorithm, compatibilityMode);
         }
 
-        private void Initialize(byte[] decryptionKey, byte[] validationKey, ShaVersion hashAlgorithm)
+        private void Initialize(byte[] decryptionKey, byte[] validationKey, ShaVersion hashAlgorithm, CompatibilityMode compatibilityMode)
         {
-            _DecryptionKeyBlob = decryptionKey;
-            _hasher = HashProvider.Create(validationKey, hashAlgorithm);            
+            _CompatibilityMode = compatibilityMode;
+            _DecryptionKeyBlob = KeyDerivator.DeriveKey(decryptionKey, _CompatibilityMode);
+
+            _hasher = HashProvider.Create(KeyDerivator.DeriveKey(validationKey, _CompatibilityMode), hashAlgorithm);
         }
 
         /// <summary>
@@ -68,13 +73,17 @@ namespace AspNetCore.LegacyAuthCookieCompat
 
             // decrypt
             byte[] decryptedCookie = Decrypt(cookieBlob, _hasher, true);
-            int ticketLength = decryptedCookie.Length - _hasher.HashSize;
+            int ticketLength = decryptedCookie.Length;
 
-            bool validHash = _hasher.CheckHash(decryptedCookie, ticketLength);
-
-            if (!validHash)
+            if (_CompatibilityMode == CompatibilityMode.Framework20SP2)
             {
-                throw new Exception("Invalid Hash");
+                ticketLength = decryptedCookie.Length - _hasher.HashSize;
+                bool validHash = _hasher.CheckHash(decryptedCookie, ticketLength);
+
+                if (!validHash)
+                {
+                    throw new Exception("Invalid Hash");
+                }
             }
 
             return FormsAuthenticationTicketHelper.Deserialize(decryptedCookie, ticketLength);
@@ -88,37 +97,53 @@ namespace AspNetCore.LegacyAuthCookieCompat
                 aesProvider.Key = _DecryptionKeyBlob;
                 aesProvider.BlockSize = 128;
                 aesProvider.GenerateIV();
-                aesProvider.IV = new byte[aesProvider.IV.Length];
-                aesProvider.Mode = CipherMode.CBC;
+
+                if (_CompatibilityMode == CompatibilityMode.Framework20SP2)
+                {
+                    aesProvider.IV = new byte[aesProvider.IV.Length];
+                    aesProvider.Mode = CipherMode.CBC;
+                }
+                else if (hasher != null)
+                {
+                    aesProvider.IV = hasher.GetIVHash(cookieBlob, aesProvider.IV.Length);
+                }
+
                 var decryptor = aesProvider.CreateEncryptor();
 
                 using (var ms = new MemoryStream())
                 {
+                    // first write the iv.
+                    if (_CompatibilityMode != CompatibilityMode.Framework20SP2)
+                    {
+                        ms.Write(aesProvider.IV, 0, aesProvider.IV.Length);
+                    }
+
                     using (var cs = new CryptoStream(ms, decryptor, CryptoStreamMode.Write))
                     {
-
-                        bool createIv = true;
-                        bool useRandomIv = true;
                         bool sign = false;
-
-                        if (createIv)
+                        if (_CompatibilityMode == CompatibilityMode.Framework20SP2)
                         {
-                            int ivLength = RoundupNumBitsToNumBytes(aesProvider.KeySize);
-                            byte[] iv = null;
+                            bool createIv = true;
+                            bool useRandomIv = true;
 
-                            if (hasher != null)
+                            if (createIv)
                             {
-                                iv = hasher.GetIVHash(cookieBlob, ivLength);
-                            }
-                            else if (useRandomIv)
-                            {
-                                iv = new byte[ivLength];
-                                RandomNumberGenerator.GetBytes(iv);
-                            }
+                                int ivLength = RoundupNumBitsToNumBytes(aesProvider.KeySize);
+                                byte[] iv = null;
 
-                            // first write the iv.
-                            cs.Write(iv, 0, iv.Length);
+                                if (hasher != null)
+                                {
+                                    iv = hasher.GetIVHash(cookieBlob, ivLength);
+                                }
+                                else if (useRandomIv)
+                                {
+                                    iv = new byte[ivLength];
+                                    RandomNumberGenerator.GetBytes(iv);
+                                }
 
+                                // first write the iv.
+                                cs.Write(iv, 0, iv.Length);
+                            }
                         }
 
                         // then write ticket data.
@@ -127,7 +152,7 @@ namespace AspNetCore.LegacyAuthCookieCompat
                         cs.FlushFinalBlock();
                         byte[] paddedData = ms.ToArray();
 
-                        if (sign)
+                        if (_CompatibilityMode == CompatibilityMode.Framework20SP2 && sign)
                         {
                             throw new NotImplementedException();
                             // append signature to encrypted bytes.
@@ -164,9 +189,18 @@ namespace AspNetCore.LegacyAuthCookieCompat
             {
                 aesProvider.Key = _DecryptionKeyBlob;
                 aesProvider.BlockSize = 128;
-                aesProvider.GenerateIV();
-                aesProvider.IV = new byte[aesProvider.IV.Length];
-                aesProvider.Mode = CipherMode.CBC;
+                if (_CompatibilityMode == CompatibilityMode.Framework20SP2)
+                {
+                    aesProvider.GenerateIV();
+                    aesProvider.IV = new byte[aesProvider.IV.Length];
+                    aesProvider.Mode = CipherMode.CBC;
+                }
+                else
+                {
+                    byte[] iv = new byte[aesProvider.IV.Length];
+                    Buffer.BlockCopy(cookieBlob, 0, iv, 0, iv.Length);
+                    aesProvider.IV = iv;
+                }
 
                 using (var ms = new MemoryStream())
                 {
@@ -174,9 +208,22 @@ namespace AspNetCore.LegacyAuthCookieCompat
                     {
                         using (var cs = new CryptoStream(ms, decryptor, CryptoStreamMode.Write))
                         {
-                            cs.Write(cookieBlob, 0, cookieBlob.Length);
+                            if (_CompatibilityMode == CompatibilityMode.Framework20SP2)
+                            {
+                                cs.Write(cookieBlob, 0, cookieBlob.Length);
+                            }
+                            else
+                            {
+                                cs.Write(cookieBlob, aesProvider.IV.Length, cookieBlob.Length - aesProvider.IV.Length);
+                            }
+
                             cs.FlushFinalBlock();
                             byte[] paddedData = ms.ToArray();
+
+                            if (_CompatibilityMode != CompatibilityMode.Framework20SP2)
+                            {
+                                return paddedData;
+                            }
 
                             // The data contains some random bytes prepended at the start. Remove them.
                             int ivLength = RoundupNumBitsToNumBytes(aesProvider.KeySize);
@@ -221,7 +268,7 @@ namespace AspNetCore.LegacyAuthCookieCompat
             byte[] cookieBlob = ticketBlob;
 
             // Compute a hash and add to the blob.
-            if (_hasher != null)
+            if (_CompatibilityMode == CompatibilityMode.Framework20SP2 && _hasher != null)
             {
                 byte[] hashBlob = _hasher.GetHMACSHAHash(ticketBlob, null, 0, ticketBlob.Length);
                 if (hashBlob == null)

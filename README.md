@@ -4,13 +4,14 @@
 
 # AspNetCore.LegacyAuthCookieCompat
 This library provides the ability to encrypt or decrypt a `FormsAuthenticationTicket` which are used for Forms Authentication cookies.
-The cookie will be compatible with .NET 2 / 3.5 & .NET 4 asp.net web applications, that use FormsAuthentication, with SHA1, SHA256, SHA512 validations and AES.
+The cookie will be compatible with ASP.NET 4.5 and lower web applications, that use FormsAuthentication, with SHA1, SHA256, SHA512 validations and AES.
+Both Framework20SP2 (ASP.NET 2.0 to 4.0 compatibility) and Framework45 (ASP.NET 4.5) compatibility modes are available.
 
-This is useful if you are hoping to, for example, integrate OWIN / AspNet Core cookies middleware, with a legacy .NET 3.5 web application, and want single sign on / off.
+This is useful if you are hoping to, for example, integrate OWIN / AspNet Core cookies middleware, with a legacy .NET 4.5 (or lower) web application, and want single sign on / off.
 
 # Usage
 
-In order to encrypt / decrypt the auth cookie data, you need to provide the `ValidationKey` and `DecryptionKey`. These can usually be found in your existing asp.net 3.5 websites web.config.
+In order to encrypt / decrypt the auth cookie data, you need to provide the `ValidationKey` and `DecryptionKey`. These can usually be found in your existing asp.net websites web.config.
 
 Web.config with SHA1 should like like below:
 
@@ -50,7 +51,10 @@ var formsAuthenticationTicket = new FormsAuthenticationTicket(2, "someuser@some-
 byte[] decryptionKeyBytes = HexUtils.HexToBinary(decryptionKey);
 byte[] validationKeyBytes = HexUtils.HexToBinary(validationKey);
 
+// Default compatibility mode is Framework20SP2. This supports ASP.NET 2.0 applications as well as higher version with compatibilityMode="Framework20SP1" on the machineKey config.
 var legacyFormsAuthenticationTicketEncryptor = new LegacyFormsAuthenticationTicketEncryptor(decryptionKeyBytes, validationKeyBytes, ShaVersion.Sha1);
+// For ASP.NET 4.5 applications without compatibilityMode="Framework20SP1", use Framework45 compatibility mode
+// var legacyFormsAuthenticationTicketEncryptor = new LegacyFormsAuthenticationTicketEncryptor(decryptionKeyBytes, validationKeyBytes, ShaVersion.Sha1, CompatibilityMode.Framework45);
 
 // Act
 // We encrypt the forms auth cookie.
