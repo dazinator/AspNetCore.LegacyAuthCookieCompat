@@ -15,9 +15,9 @@ namespace AspNetCore.LegacyAuthCookieCompat.Tests
 			string decryptionKey = "AC7387D7E54B156377D81930CF237888854B5B5B515CF2D6356541255E696144";
 
 			// Arrange
-			var issueDate = DateTime.UtcNow;
-			var expiryDate = issueDate.AddHours(1);
-			var formsAuthenticationTicket = new FormsAuthenticationTicket(2, "someuser@some-email.com", issueDate, expiryDate, false, "custom data", "/");
+			var issueDateUtc = DateTime.UtcNow;
+			var expiryDateUtc = issueDateUtc.AddHours(1);
+			var formsAuthenticationTicket = new FormsAuthenticationTicket(2, "someuser@some-email.com", issueDateUtc.ToLocalTime(), expiryDateUtc.ToLocalTime(), false, "custom data", "/");
 
 			byte[] decryptionKeyBytes = HexUtils.HexToBinary(decryptionKey);
 			byte[] validationKeyBytes = HexUtils.HexToBinary(validationKey);
@@ -35,13 +35,15 @@ namespace AspNetCore.LegacyAuthCookieCompat.Tests
 			FormsAuthenticationTicket decryptedFormsAuthenticationTicket = legacyFormsAuthenticationTicketEncryptor.DecryptCookie(encryptedText);
 
 			Assert.AreEqual(formsAuthenticationTicket.CookiePath, decryptedFormsAuthenticationTicket.CookiePath);
-			Assert.AreEqual(formsAuthenticationTicket.Expiration, decryptedFormsAuthenticationTicket.Expiration);
-			Assert.AreEqual(formsAuthenticationTicket.Expired, decryptedFormsAuthenticationTicket.Expired);
 			Assert.AreEqual(formsAuthenticationTicket.IsPersistent, decryptedFormsAuthenticationTicket.IsPersistent);
-			Assert.AreEqual(formsAuthenticationTicket.IssueDate, decryptedFormsAuthenticationTicket.IssueDate);
 			Assert.AreEqual(formsAuthenticationTicket.UserData, decryptedFormsAuthenticationTicket.UserData);
 			Assert.AreEqual(formsAuthenticationTicket.Version, decryptedFormsAuthenticationTicket.Version);
+			Assert.AreEqual(false, decryptedFormsAuthenticationTicket.Expired);
+			Assert.AreEqual(true, decryptedFormsAuthenticationTicket.IsValid());
+			Assert.AreEqual(formsAuthenticationTicket.Expired, decryptedFormsAuthenticationTicket.Expired);
+			Assert.AreEqual(formsAuthenticationTicket.IsValid(), decryptedFormsAuthenticationTicket.IsValid());
+			Assert.AreEqual(formsAuthenticationTicket.Expiration, decryptedFormsAuthenticationTicket.Expiration);
+			Assert.AreEqual(formsAuthenticationTicket.IssueDate, decryptedFormsAuthenticationTicket.IssueDate);
 		}
 	}
-
 }
