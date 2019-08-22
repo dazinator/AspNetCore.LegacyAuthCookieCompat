@@ -67,3 +67,6 @@ To Decrypt: (We'd usually read the encrypted text from the auth cookie)
 FormsAuthenticationTicket decryptedTicket = legacyFormsAuthenticationTicketEncryptor.DecryptCookie(encryptedText);
 ```
 
+# License
+
+See the [LICENSE](LICENSE.md) file for license rights and limitations (MIT).
