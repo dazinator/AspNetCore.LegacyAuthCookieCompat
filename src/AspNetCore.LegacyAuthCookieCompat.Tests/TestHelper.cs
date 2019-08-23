@@ -8,7 +8,7 @@ namespace AspNetCore.LegacyAuthCookieCompat.Tests
 	{
 		public static bool IsValid(this FormsAuthenticationTicket ticket)
 		{
-			return ticket.IssueDate < DateTime.Now && !ticket.Expired;
+			return ticket.IssueDate <= DateTime.Now && !ticket.Expired;
 		}
 	}
 }
