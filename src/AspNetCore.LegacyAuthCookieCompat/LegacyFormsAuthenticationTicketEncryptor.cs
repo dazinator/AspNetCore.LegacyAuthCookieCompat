@@ -180,7 +180,7 @@ namespace AspNetCore.LegacyAuthCookieCompat
                 if (cookieBlob == null)
                 {
                     // signature verification failed
-                    throw new Exception("Signature verification failed");
+                    throw new CryptographicException("Signature verification failed");
                 }
             }
 
