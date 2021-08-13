@@ -20,6 +20,8 @@ namespace AspNetCore.LegacyAuthCookieCompat
                     return new Sha1HashProvider(validationKey);
                 case ShaVersion.Sha256:
                     return new Sha256HashProvider(validationKey);
+                case ShaVersion.Sha384:
+                    return new Sha384HashProvider(validationKey);
                 case ShaVersion.Sha512:
                     return new Sha512HashProvider(validationKey);
                 default:
